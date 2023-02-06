@@ -645,7 +645,7 @@ export class RemixSite extends Construct implements SSTConstruct {
     else {
       const bucketProps = cdk?.bucket as s3.BucketProps;
       return new s3.Bucket(this, "S3Bucket", {
-        publicReadAccess: true,
+        publicReadAccess: false,
         autoDeleteObjects: true,
         removalPolicy: RemovalPolicy.DESTROY,
         ...bucketProps,
