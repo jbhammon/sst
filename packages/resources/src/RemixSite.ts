@@ -44,7 +44,11 @@ import {
   buildErrorResponsesForRedirectToIndex,
 } from "./BaseSite.js";
 import { Permissions, attachPermissionsToRole } from "./util/permission.js";
-import { ENVIRONMENT_PLACEHOLDER, FunctionBindingProps, getParameterPath } from "./util/functionBinding.js";
+import {
+  ENVIRONMENT_PLACEHOLDER,
+  FunctionBindingProps,
+  getParameterPath,
+} from "./util/functionBinding.js";
 
 const __dirname = url.fileURLToPath(new URL(".", import.meta.url));
 
@@ -56,9 +60,9 @@ type RemixConfig = {
   server?: string;
 };
 
-export interface RemixDomainProps extends BaseSiteDomainProps { }
+export interface RemixDomainProps extends BaseSiteDomainProps {}
 export interface RemixCdkDistributionProps
-  extends BaseSiteCdkDistributionProps { }
+  extends BaseSiteCdkDistributionProps {}
 export interface RemixSiteProps {
   /**
    * The Remix app server is deployed to a Lambda function in a single region. Alternatively, you can enable this option to deploy to Lambda@Edge.
@@ -508,7 +512,10 @@ export class RemixSite extends Construct implements SSTConstruct {
       },
       permissions: {
         "ssm:GetParameters": [
-          `arn:aws:ssm:${app.region}:${app.account}:parameter${getParameterPath(this, "url")}`,
+          `arn:aws:ssm:${app.region}:${app.account}:parameter${getParameterPath(
+            this,
+            "url"
+          )}`,
         ],
       },
     };
@@ -581,8 +588,8 @@ export class RemixSite extends Construct implements SSTConstruct {
     const app = this.node.root as App;
     const fileSizeLimit = app.isRunningSSTTest()
       ? // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore: "sstTestFileSizeLimitOverride" not exposed in props
-      this.props.sstTestFileSizeLimitOverride || 200
+        // @ts-ignore: "sstTestFileSizeLimitOverride" not exposed in props
+        this.props.sstTestFileSizeLimitOverride || 200
       : 200;
 
     // First we need to create zip files containing the statics
@@ -645,7 +652,7 @@ export class RemixSite extends Construct implements SSTConstruct {
     else {
       const bucketProps = cdk?.bucket as s3.BucketProps;
       return new s3.Bucket(this, "S3Bucket", {
-        publicReadAccess: true,
+        publicReadAccess: false,
         autoDeleteObjects: true,
         removalPolicy: RemovalPolicy.DESTROY,
         ...bucketProps,
@@ -1136,7 +1143,9 @@ export class RemixSite extends Construct implements SSTConstruct {
 
     const waitForInvalidation = this.isPlaceholder
       ? false
-      : (this.props.waitForInvalidation === false ? false : true);
+      : this.props.waitForInvalidation === false
+      ? false
+      : true;
     return new CustomResource(this, "CloudFrontInvalidation", {
       serviceToken: invalidator.functionArn,
       resourceType: "Custom::SSTCloudFrontInvalidation",
